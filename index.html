@@ -1,10 +1,11 @@
 <!-- Code from d3-graph-gallery.com -->
 <!DOCTYPE html>
 <meta charset="utf-8">
-
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v4.js"></script>
 
+<!-- Load color scale -->
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 <!-- Create a div where the graph will take place -->
 <div id="my_dataviz"></div>
 
@@ -46,7 +47,12 @@ d3.csv("https://kzhong678.github.io/owid_covid_data_cleaned.csv", function(data)
   // Add a scale for bubble size
   var z = d3.scaleLinear()
     .domain([100, 1439323774])
-    .range([ 1, 25]);
+    .range([ 5, 25]);
+
+    // Add a scale for bubble color
+  var myColor = d3.scaleOrdinal()
+    .domain(["Asia", "Africa", "Europe", "North America", "Oceania", "South America"])
+    .range(d3.schemeSet1);
 
   // Add dots
   svg.append('g')
@@ -57,7 +63,7 @@ d3.csv("https://kzhong678.github.io/owid_covid_data_cleaned.csv", function(data)
       .attr("cx", function (d) { return x(d.gdp_per_capita); } )
       .attr("cy", function (d) { return y(d.total_cases_per_million); } )
       .attr("r", function (d) { return z(d.population); } )
-      .style("fill", "#69b3a2")
+      .style("fill", function (d) { return myColor(d.continent); } )
       .style("opacity", "0.7")
       .attr("stroke", "black")
 

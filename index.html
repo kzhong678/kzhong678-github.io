@@ -46,7 +46,7 @@ d3.csv("https://kzhong678.github.io/owid_covid_data_cleaned.csv", function(data)
   // Add a scale for bubble size
   var z = d3.scaleLinear()
     .domain([100, 1439323774])
-    .range([ 1, 25]);
+    .range([ 5, 25]);
 
   // Add dots
   svg.append('g')

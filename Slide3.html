@@ -7,7 +7,7 @@
 <!-- Load color scale -->
 <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 
-<a href="https://kzhong678.github.io/Slide4_JumpOff">This is a link to the next slide</a>
+<a href="https://kzhong678.github.io/index.html">Click here to return to the beginning</a>
 <!-- Create a div where the graph will take place -->
 <div id="my_dataviz"></div>
 
@@ -33,7 +33,7 @@ d3.csv("https://kzhong678.github.io/owid_covid_data_cleaned.csv", function(data)
 
   // Add X axis
   var x = d3.scaleLinear()
-    .domain([0, 120000])
+    .domain([0, 0])
     .range([ 0, width ]);
   svg.append("g")
     .attr("class", "myXaxis")
@@ -42,11 +42,11 @@ d3.csv("https://kzhong678.github.io/owid_covid_data_cleaned.csv", function(data)
 
   // Add Y axis
   var y = d3.scaleLinear()
-    .domain([0, 40000])
+    .domain([0, 10000])
     .range([ height, 0]);
   svg.append("g")
     .call(d3.axisLeft(y)
-            //.tickValues(['10','100', '1000', '5000', "10000" , "20000"])
+            //.tickValues(['10','100', '1000', '5000', "10000" , "20000", "30000", "40000"])
             .tickFormat(d3.format('d')));
 
   // Add a scale for bubble size
@@ -112,20 +112,12 @@ d3.csv("https://kzhong678.github.io/owid_covid_data_cleaned.csv", function(data)
       .on("mouseover", showTooltip )
       .on("mousemove", moveTooltip )
       .on("mouseleave", hideTooltip )
-/*  x.domain([0, 120000])
+  x.domain([0, 120000])
     svg.select(".myXaxis")
       .transition()
       .duration(2000)
       .attr("opacity", "1")
       .call(d3.axisBottom(x));
-      */
-  y.domain([0,20000])
-  svg.select(".myYaxis")
-    .transition()
-    .duration(2000)
-    .attr("opacity", "1")
-    .call(d3.axisLeft(y)
-            .tickFormat(d3.format('d')));
   svg.selectAll("circle")
     .transition()
     .delay(function(d,i){return(i/10)})

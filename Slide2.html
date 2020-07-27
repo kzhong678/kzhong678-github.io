@@ -7,7 +7,7 @@
 <!-- Load color scale -->
 <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 
-<a href="https://kzhong678.github.io/Slide4_JumpOff">This is a link to the next slide</a>
+<a href="https://kzhong678.github.io/Slide3">This is a link to the next slide</a>
 <!-- Create a div where the graph will take place -->
 <div id="my_dataviz"></div>
 
@@ -42,7 +42,7 @@ d3.csv("https://kzhong678.github.io/owid_covid_data_cleaned.csv", function(data)
 
   // Add Y axis
   var y = d3.scaleLinear()
-    .domain([0, 40000])
+    .domain([0, 10000])
     .range([ height, 0]);
   svg.append("g")
     .call(d3.axisLeft(y)

@@ -201,15 +201,11 @@ CREATING THE X and Y Axis
 
     <!--This section gives the user parameters that can be changed -->
     function updatePlotX() {
-
       // Get the value of the button
       xlim = this.value
       // Update X axis
       x.domain([0,xlim])
       xAxis.transition().duration(1000).call(d3.axisBottom(x))
-      y.domain([0,ylim])
-      yAxis.transition().duration(1000).call(d3.axisLeft(y))
-
       // Update chart
       svg.selectAll("circle")
          .data(data)

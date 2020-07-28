@@ -1,17 +1,39 @@
 <!-- Code from d3-graph-gallery.com -->
 <!DOCTYPE html>
 <meta charset="utf-8">
+<style>
+.center {
+  text-align: center;
+  border: 3px solid black;
+}
+.controls{
+  text-align: center;
+  size: 30px;
+}
 
+</style>
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v4.js"></script>
 
 <!-- Load color scale -->
 <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 
-<a href="http://kzhong678.github.io/Slide2">This is a link</a>
+<p>This is some filler text.</p>
 <!-- Create a div where the graph will take place -->
-<div id="my_dataviz"></div>
+<div id="my_dataviz" class="center"></div>
 
+<!--This contains the Controls -->
+<p style="text-align:center">Maximum GDP:
+<input type="number" id="buttonXlim" value=120000 class="controls">
+</p>
+<p style="text-align:center">Maximum Age:
+<input type="number" id="buttonYlim" value=90 class="controls">
+</p>
+
+</style>
+<div id ="Link_to_Next" class="center">
+  <a href="http://kzhong678.github.io/Slide2"> Link to next page </a>
+</div>
 <script>
 
 // set the dimensions and margins of the graph
@@ -39,7 +61,7 @@ CREATING THE X and Y Axis
   var x = d3.scaleLinear()
     .domain([0, 0])
     .range([ 0, width ]);
-  svg.append("g")
+  var xAxis =svg.append("g")
     .attr("class", "myXaxis")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(x));
@@ -55,7 +77,7 @@ CREATING THE X and Y Axis
   var y = d3.scaleLinear()
     .domain([50, 90])
     .range([ height, 0]);
-  svg.append("g")
+  var yAxis = svg.append("g")
     .call(d3.axisLeft(y));
 
   // Y axis labe;. This tells users what the axis is.
@@ -90,7 +112,6 @@ CREATING THE X and Y Axis
       .style("border-radius", "5px")
       .style("padding", "10px")
       .style("color", "white")
-
   // Step 2, create the showTooltip, moveTooltip, and hideTooltip functions
   var showTooltip = function(d) {
     tooltip
@@ -117,13 +138,7 @@ CREATING THE X and Y Axis
       .style("opacity", 0)
   }
 
-
-
-
-
-  /***************************************
-  Data added to the Graph
-  ****************************************/
+  <!--Data added to the Graph -->
 
   // Add dots
   svg.append('g')
@@ -158,20 +173,9 @@ CREATING THE X and Y Axis
     .attr("cx", function (d) { return x(d.gdp_per_capita); } )
     .attr("cy", function (d) { return y(d.life_expectancy); } )
 
-
-
     /***************************************
     Creates the legend, and contains the highlight functions
     ****************************************/
-    var highlight = function(d){
-      // reduce opacity of all groups
-      d3.selectAll(".bubbles").style("opacity", .05)
-      // expect the one that is hovered
-      d3.selectAll("."+d).style("opacity", 1)
-    }
-    var noHighlight = function(d){
-      d3.selectAll(".bubbles").style("opacity", 1)
-    }
     var size = 20
     var allgroups = ["Asia", "Africa", "Europe", "North America","Oceania","South America"]
     svg.selectAll("myrect")
@@ -182,8 +186,6 @@ CREATING THE X and Y Axis
         .attr("cy", function(d,i){ return 10 + i*(size+5)}) // 100 is where the first dot appears. 25 is the distance between dots
         .attr("r", 7)
         .style("fill", function(d){ return myColor(d)})
-        .on("mouseover", highlight)
-        .on("mouseleave", noHighlight)
 
     // Add labels beside legend dots
     svg.selectAll("mylabels")
@@ -196,7 +198,45 @@ CREATING THE X and Y Axis
         .text(function(d){ return d})
         .attr("text-anchor", "left")
         .style("alignment-baseline", "middle")
-        .on("mouseover", highlight)
-        .on("mouseleave", noHighlight)
+
+    <!--This section gives the user parameters that can be changed -->
+    function updatePlotX() {
+
+      // Get the value of the button
+      xlim = this.value
+      // Update X axis
+      x.domain([0,xlim])
+      xAxis.transition().duration(1000).call(d3.axisBottom(x))
+      y.domain([0,ylim])
+      yAxis.transition().duration(1000).call(d3.axisLeft(y))
+
+      // Update chart
+      svg.selectAll("circle")
+         .data(data)
+         .transition()
+         .duration(1000)
+         .attr("cx", function (d) { return x(d.gdp_per_capita); } )
+         .attr("cy", function (d) { return y(d.life_expectancy); } )
+    }
+    function updatePlotY() {
+
+      // Get the value of the button
+      ylim = this.value
+
+      //Update Y axis
+      y.domain([0,ylim])
+      yAxis.transition().duration(1000).call(d3.axisLeft(y))
+
+      // Update chart
+      svg.selectAll("circle")
+         .data(data)
+         .transition()
+         .duration(1000)
+         .attr("cx", function (d) { return x(d.gdp_per_capita); } )
+         .attr("cy", function (d) { return y(d.life_expectancy); } )
+    }
+    // Add an event listener to the button created in the html part
+    d3.select("#buttonXlim").on("input", updatePlotX)
+    d3.select("#buttonYlim").on("input", updatePlotY)
   })
 </script>

@@ -4,3 +4,5 @@ The purpose of this hub is to host the Narrative Visualization Project. This is 
 
 ***About the Author:***
 Kevin Zhong is a graduate student at the University of Illinois Urbana Champaign.
+
+All data is taken from https://ourworldindata.org/coronavirus-source-data

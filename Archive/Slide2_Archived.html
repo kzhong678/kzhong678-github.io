@@ -1,67 +1,16 @@
 <!-- Code from d3-graph-gallery.com -->
 <!DOCTYPE html>
 <meta charset="utf-8">
-<style>
-.center {
-  text-align: center;
-  border: 3px solid black;
-}
-.controls{
-  text-align: center;
-  size: 30px;
-}
 
-</style>
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v4.js"></script>
+
 <!-- Load color scale -->
 <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 
-<h1 style="text-align:center">Gross Domestic Product vs Various Health Factors</h1>
-
+<a href="http://kzhong678.github.io/Slide3">This is a link</a>
 <!-- Create a div where the graph will take place -->
-<div id="my_dataviz" class="center"></div>
-
-<!--This contains the Controls -->
-<p style="text-align:center">Maximum GDP:
-<input type="number" id="buttonXlim" value=120000 class="controls" onkeypress="updateTextXInput(this.value)" onchange="updateTextXInput(this.value)">
-<input type="range" min="0" max="120000" value="120000" id ="xlimSlider" oninput="updateTextXInput(this.value)" onchange="updateTextXInput(this.value)">
-</p>
-
-<p style="text-align:center">Maximum Age:
-<input type="number" id="buttonYlim" value=90 class="controls" onkeypress="updateTextYInput(this.value)" onchange="updateTextYInput(this.value)">
-<input type="range" min="50" max="90" value="90" id ="ylimSlider" oninput="updateTextYInput(this.value)" onchange="updateTextYInput(this.value)">
-
-</p>
-<div id ="Commentary" class="center">
-  <p>Gross Domestic Product (GDP)  is defined as the total value of goods produced and services provided in a country during one year. GDP per capita is simply GDP per indiviual.</p>
-  <p>According to Phillipp Lepenies, GDP can be considered as the "world's most powerful statistical indicator of national development and progress." The graph above has GDP per Capita plotted against life expectancy. It appears that the two factors are correlated!</p>
-  <p>In this interactive slide show, we will explore how true this statement is with regards to various healthcare measures. Each slide will have a graph. Hover over a data point for more additional data, and feel free to adjust the sliders or enter a value into the input boxrd to change axis limits.</p>
-</div>
-
-<div id ="Link_to_Next" class="center">
-  <p>You are on slide 1 of 4.</p>
-  <a href="http://kzhong678.github.io/Slide2"> Click here to visit the next page </a>
-  <p>This website was created by Kevin Zhong for CS498, a data visualization course taught by John Hart at the University Of Illinois Urbana Champaign.</p>
-</div>
-
-<script>
-    function updateTextXInput(val) {
-      val = val > 120000 ? 120000 : val;
-      val = val < 0 ? 0 : val;
-      document.getElementById('buttonXlim').value = val;
-      document.getElementById('xlimSlider').value = val;
-    }
-</script>
-
-<script>
-    function updateTextYInput(val) {
-      val = val > 90 ? 90 : val;
-      val = val < 50 ? 50 : val;
-      document.getElementById('buttonYlim').value = val;
-      document.getElementById('ylimSlider').value = val;
-    }
-</script>
+<div id="my_dataviz"></div>
 
 <script>
 
@@ -90,7 +39,7 @@ CREATING THE X and Y Axis
   var x = d3.scaleLinear()
     .domain([0, 0])
     .range([ 0, width ]);
-  var xAxis =svg.append("g")
+  svg.append("g")
     .attr("class", "myXaxis")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(x));
@@ -100,26 +49,27 @@ CREATING THE X and Y Axis
       .attr("text-anchor", "end")
       .attr("x", width)
       .attr("y", height+50 )
-      .text("GDP per Capita");
+      .text("Gdp per Capita");
 
-  // Y Axis Static
   var y = d3.scaleLinear()
-    .domain([50, 90])
+    .domain([0, 40000])
     .range([ height, 0]);
-  var yAxis = svg.append("g")
-    .call(d3.axisLeft(y));
+  svg.append("g")
+    .call(d3.axisLeft(y)
+            //.tickValues(['10','100', '1000', '5000', "10000" , "20000", "30000", "40000"])
+            .tickFormat(d3.format('d')));
 
   // Y axis labe;. This tells users what the axis is.
   svg.append("text")
       .attr("text-anchor", "end")
       .attr("x", +5)
       .attr("y", +10 )
-      .text("Life expectancy")
+      .text("COVID 19 Total Cases per Million")
       .attr("text-anchor", "start")
 
   // Scales the bubblle size
   var bubble_size = d3.scaleLinear()
-    .domain([100, 1439323774])
+    .domain([0, 1439323774])
     .range([ 5, 25]);
 
   // Add a scale for bubble color. schemeSet2 is used because it has the most readable Yellow
@@ -141,6 +91,7 @@ CREATING THE X and Y Axis
       .style("border-radius", "5px")
       .style("padding", "10px")
       .style("color", "white")
+
   // Step 2, create the showTooltip, moveTooltip, and hideTooltip functions
   var showTooltip = function(d) {
     tooltip
@@ -150,8 +101,12 @@ CREATING THE X and Y Axis
       .style("opacity", 1)
       .html("Country: " + d.location +
             "<br> GDP Per Capita: $" + d.gdp_per_capita +
-            "<br> Life Expectancy: " + d.life_expectancy + " years" +
-            "<br> Population: " + d.population + " people")
+            "<br> Total Cases per Million: " + d.total_cases_per_million + " cases" +
+            "<br> Total Deaths per Million: " + d.total_deaths_per_million + " cases" +
+            "<br> Total Cases: " + d.total_cases + " cases" +
+            "<br> Total Deaths: " + d.total_deaths + " Deaths" +
+            "<br> Population: " + d.population + " people" +
+            "<br> Continent: " + d.continent)
       .style("left", (d3.mouse(this)[0]+30) + "px")
       .style("top", (d3.mouse(this)[1]+30) + "px")
   }
@@ -167,7 +122,9 @@ CREATING THE X and Y Axis
       .style("opacity", 0)
   }
 
-  <!--Data added to the Graph -->
+  /***************************************
+  Data added to the Graph
+  ****************************************/
 
   // Add dots
   svg.append('g')
@@ -176,7 +133,7 @@ CREATING THE X and Y Axis
     .enter()
     .append("circle")
       .attr("cx", function (d) { return x(d.gdp_per_capita); } )
-      .attr("cy", function (d) { return y(d.life_expectancy); } )
+      .attr("cy", function (d) { return y(d.total_cases_per_million); } )
       .attr("r", function (d) { return bubble_size(d.population); } )
       .style("fill", function (d) { return myColor(d.continent); } )
       .style("opacity", "0.7")
@@ -200,11 +157,20 @@ CREATING THE X and Y Axis
     .delay(function(d,i){return(i/10)})
     .duration(2000)
     .attr("cx", function (d) { return x(d.gdp_per_capita); } )
-    .attr("cy", function (d) { return y(d.life_expectancy); } )
+    .attr("cy", function (d) { return y(d.total_cases_per_million); } )
 
     /***************************************
     Creates the legend, and contains the highlight functions
     ****************************************/
+    var highlight = function(d){
+      // reduce opacity of all groups
+      d3.selectAll(".bubbles").style("opacity", .05)
+      // expect the one that is hovered
+      d3.selectAll("."+d).style("opacity", 1)
+    }
+    var noHighlight = function(d){
+      d3.selectAll(".bubbles").style("opacity", 1)
+    }
     var size = 20
     var allgroups = ["Asia", "Africa", "Europe", "North America","Oceania","South America"]
     svg.selectAll("myrect")
@@ -215,6 +181,8 @@ CREATING THE X and Y Axis
         .attr("cy", function(d,i){ return 10 + i*(size+5)}) // 100 is where the first dot appears. 25 is the distance between dots
         .attr("r", 7)
         .style("fill", function(d){ return myColor(d)})
+        .on("mouseover", highlight)
+        .on("mouseleave", noHighlight)
 
     // Add labels beside legend dots
     svg.selectAll("mylabels")
@@ -227,44 +195,7 @@ CREATING THE X and Y Axis
         .text(function(d){ return d})
         .attr("text-anchor", "left")
         .style("alignment-baseline", "middle")
-
-    <!--This section gives the user parameters that can be changed -->
-    function updatePlotX() {
-      // Get the value of the button
-      xlim = this.value
-      // Update X axis
-      x.domain([0,xlim])
-      xAxis.transition().duration(1000).call(d3.axisBottom(x))
-      // Update chart
-      svg.selectAll("circle")
-         .data(data)
-         .transition()
-         .duration(1000)
-         .attr("cx", function (d) { return x(d.gdp_per_capita); } )
-         .attr("cy", function (d) { return y(d.life_expectancy); } )
-    }
-    function updatePlotY() {
-
-      // Get the value of the button
-      ylim = this.value
-
-      //Update Y axis
-      y.domain([50,ylim])
-      yAxis.transition().duration(1000).call(d3.axisLeft(y))
-
-      // Update chart
-      svg.selectAll("circle")
-         .data(data)
-         .transition()
-         .duration(1000)
-         .attr("cx", function (d) { return x(d.gdp_per_capita); } )
-         .attr("cy", function (d) { return y(d.life_expectancy); } )
-    }
-    // Add an event listener to the button created in the html part
-    d3.select("#buttonXlim").on("input", updatePlotX)
-    d3.select("#xlimSlider").on("input", updatePlotX)
-    d3.select("#buttonYlim").on("input", updatePlotY)
-    d3.select("#ylimSlider").on("input", updatePlotY)
-
+        .on("mouseover", highlight)
+        .on("mouseleave", noHighlight)
   })
 </script>

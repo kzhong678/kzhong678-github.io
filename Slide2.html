@@ -1,16 +1,65 @@
 <!-- Code from d3-graph-gallery.com -->
 <!DOCTYPE html>
 <meta charset="utf-8">
+<style>
+.center {
+  text-align: center;
+  border: 3px solid black;
+}
+.controls{
+  text-align: center;
+  size: 30px;
+}
 
+</style>
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v4.js"></script>
-
 <!-- Load color scale -->
 <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 
-<a href="http://kzhong678.github.io/Slide3">This is a link</a>
+<h1 style="text-align:center">Gross Domestic Product vs CardioVacular Death Rate</h1>
+
 <!-- Create a div where the graph will take place -->
-<div id="my_dataviz"></div>
+<div id="my_dataviz" class="center"></div>
+
+<!--This contains the Controls -->
+<p style="text-align:center">Maximum GDP:
+<input type="number" id="buttonXlim" value=120000 class="controls" onkeypress="updateTextXInput(this.value)" onchange="updateTextXInput(this.value)">
+<input type="range" min="0" max="120000" value="120000" id ="xlimSlider" oninput="updateTextXInput(this.value)" onchange="updateTextXInput(this.value)">
+</p>
+
+<p style="text-align:center">Cardiovascular DeathRate:
+<input type="number" id="buttonYlim" value=725 class="controls" onkeypress="updateTextYInput(this.value)" onchange="updateTextYInput(this.value)">
+<input type="range" min="0" max="725" value="725" id ="ylimSlider" oninput="updateTextYInput(this.value)" onchange="updateTextYInput(this.value)">
+
+</p>
+<div id ="Commentary" class="center">
+  <p>Cardiovascular deathrate is defined as the annual number of deaths per 100,000 people. As GDP increases, there appears to be a weak trend towards a lower cardiovascular deathrate. Based on this observation, higher GDP might be an indicator for greater healthcare. </p>
+</div>
+
+<div id ="Link_to_Next" class="center">
+  <p>You are on slide 2 of 5.</p>
+  <a href="http://kzhong678.github.io/Slide3"> Click here to go to the next slide</a>
+  <p>This website was created by Kevin Zhong for CS498, a data visualization course taught by John Hart at the University Of Illinois Urbana Champaign.</p>
+</div>
+
+<script>
+    function updateTextXInput(val) {
+      val = val > 120000 ? 120000 : val;
+      val = val < 0 ? 0 : val;
+      document.getElementById('buttonXlim').value = val;
+      document.getElementById('xlimSlider').value = val;
+    }
+</script>
+
+<script>
+    function updateTextYInput(val) {
+      val = val > 725 ? 725 : val;
+      val = val < 0 ? 0 : val;
+      document.getElementById('buttonYlim').value = val;
+      document.getElementById('ylimSlider').value = val;
+    }
+</script>
 
 <script>
 
@@ -39,7 +88,7 @@ CREATING THE X and Y Axis
   var x = d3.scaleLinear()
     .domain([0, 0])
     .range([ 0, width ]);
-  svg.append("g")
+  var xAxis =svg.append("g")
     .attr("class", "myXaxis")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(x));
@@ -49,27 +98,26 @@ CREATING THE X and Y Axis
       .attr("text-anchor", "end")
       .attr("x", width)
       .attr("y", height+50 )
-      .text("Gdp per Capita");
+      .text("GDP per Capita");
 
+  // Y Axis Static
   var y = d3.scaleLinear()
-    .domain([0, 40000])
+    .domain([0, 725])
     .range([ height, 0]);
-  svg.append("g")
-    .call(d3.axisLeft(y)
-            //.tickValues(['10','100', '1000', '5000', "10000" , "20000", "30000", "40000"])
-            .tickFormat(d3.format('d')));
+  var yAxis = svg.append("g")
+    .call(d3.axisLeft(y));
 
   // Y axis labe;. This tells users what the axis is.
   svg.append("text")
       .attr("text-anchor", "end")
       .attr("x", +5)
       .attr("y", +10 )
-      .text("COVID 19 Total Cases per Million")
+      .text("Cardiovascular Deaths per 100,000 people")
       .attr("text-anchor", "start")
 
   // Scales the bubblle size
   var bubble_size = d3.scaleLinear()
-    .domain([0, 1439323774])
+    .domain([100, 1439323774])
     .range([ 5, 25]);
 
   // Add a scale for bubble color. schemeSet2 is used because it has the most readable Yellow
@@ -91,7 +139,6 @@ CREATING THE X and Y Axis
       .style("border-radius", "5px")
       .style("padding", "10px")
       .style("color", "white")
-
   // Step 2, create the showTooltip, moveTooltip, and hideTooltip functions
   var showTooltip = function(d) {
     tooltip
@@ -101,10 +148,7 @@ CREATING THE X and Y Axis
       .style("opacity", 1)
       .html("Country: " + d.location +
             "<br> GDP Per Capita: $" + d.gdp_per_capita +
-            "<br> Total Cases per Million: " + d.total_cases_per_million + " cases" +
-            "<br> Total Deaths per Million: " + d.total_deaths_per_million + " cases" +
-            "<br> Total Cases: " + d.total_cases + " cases" +
-            "<br> Total Deaths: " + d.total_deaths + " Deaths" +
+            "<br> CardioVascular Deaths per 100,000 people: " + d.cardiovasc_death_rate + " people" +
             "<br> Population: " + d.population + " people" +
             "<br> Continent: " + d.continent)
       .style("left", (d3.mouse(this)[0]+30) + "px")
@@ -122,13 +166,7 @@ CREATING THE X and Y Axis
       .style("opacity", 0)
   }
 
-
-
-
-
-  /***************************************
-  Data added to the Graph
-  ****************************************/
+  <!--Data added to the Graph -->
 
   // Add dots
   svg.append('g')
@@ -161,22 +199,11 @@ CREATING THE X and Y Axis
     .delay(function(d,i){return(i/10)})
     .duration(2000)
     .attr("cx", function (d) { return x(d.gdp_per_capita); } )
-    .attr("cy", function (d) { return y(d.total_cases_per_million); } )
-
-
+    .attr("cy", function (d) { return y(d.cardiovasc_death_rate); } )
 
     /***************************************
     Creates the legend, and contains the highlight functions
     ****************************************/
-    var highlight = function(d){
-      // reduce opacity of all groups
-      d3.selectAll(".bubbles").style("opacity", .05)
-      // expect the one that is hovered
-      d3.selectAll("."+d).style("opacity", 1)
-    }
-    var noHighlight = function(d){
-      d3.selectAll(".bubbles").style("opacity", 1)
-    }
     var size = 20
     var allgroups = ["Asia", "Africa", "Europe", "North America","Oceania","South America"]
     svg.selectAll("myrect")
@@ -187,8 +214,6 @@ CREATING THE X and Y Axis
         .attr("cy", function(d,i){ return 10 + i*(size+5)}) // 100 is where the first dot appears. 25 is the distance between dots
         .attr("r", 7)
         .style("fill", function(d){ return myColor(d)})
-        .on("mouseover", highlight)
-        .on("mouseleave", noHighlight)
 
     // Add labels beside legend dots
     svg.selectAll("mylabels")
@@ -201,7 +226,44 @@ CREATING THE X and Y Axis
         .text(function(d){ return d})
         .attr("text-anchor", "left")
         .style("alignment-baseline", "middle")
-        .on("mouseover", highlight)
-        .on("mouseleave", noHighlight)
+
+    <!--This section gives the user parameters that can be changed -->
+    function updatePlotX() {
+      // Get the value of the button
+      xlim = this.value
+      // Update X axis
+      x.domain([0,xlim])
+      xAxis.transition().duration(1000).call(d3.axisBottom(x))
+      // Update chart
+      svg.selectAll("circle")
+         .data(data)
+         .transition()
+         .duration(1000)
+         .attr("cx", function (d) { return x(d.gdp_per_capita); } )
+         .attr("cy", function (d) { return y(d.cardiovasc_death_rate); } )
+    }
+    function updatePlotY() {
+
+      // Get the value of the button
+      ylim = this.value
+
+      //Update Y axis
+      y.domain([0,ylim])
+      yAxis.transition().duration(1000).call(d3.axisLeft(y))
+
+      // Update chart
+      svg.selectAll("circle")
+         .data(data)
+         .transition()
+         .duration(1000)
+         .attr("cx", function (d) { return x(d.gdp_per_capita); } )
+         .attr("cy", function (d) { return y(d.cardiovasc_death_rate); } )
+    }
+    // Add an event listener to the button created in the html part
+    d3.select("#buttonXlim").on("input", updatePlotX)
+    d3.select("#xlimSlider").on("input", updatePlotX)
+    d3.select("#buttonYlim").on("input", updatePlotY)
+    d3.select("#ylimSlider").on("input", updatePlotY)
+
   })
 </script>
